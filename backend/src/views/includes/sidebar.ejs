@@ -1,0 +1,33 @@
+<!-- Sidebar Start -->
+<div class="sidebar pe-4 pb-3">
+    <nav class="navbar bg-light navbar-light">
+        <img src="/img/logo3.png" style="width: 70%; height: auto; margin: 10px 0px 18px 25px; border-radius: 5px;" />
+        <div class="d-flex align-items-center ms-4 mb-4">
+            <div class="position-relative">
+                <% if(member.memberImage) { %>
+                    <a href="/admin/dashboard"> <img class="rounded-circle" src="/<%= member.memberImage %>" alt=""
+                            style="width: 40px; height: 40px;"></a>
+                    <% } %>
+                        <div
+                            class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1">
+                        </div>
+            </div>
+            <div class="ms-3">
+                <h6 class="mb-0">
+                    <a href="/admin/dashboard">
+                        <%= member.memberNick %>
+                    </a>
+                </h6>
+            </div>
+        </div>
+        <div class="navbar-nav w-100">
+            <a href="/admin/dashboard" class="nav-item nav-link <%= activeMenu === 'dashboard' ? 'active' : '' %>"><i
+                    class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
+            <a href="/admin/product/all" class="nav-item nav-link <%= activeMenu === 'products' ? 'active' : '' %>"><i
+                    class="fa fa-laptop me-2"></i>Products</a>
+            <a href="/admin/user/all" class="nav-item nav-link <%= activeMenu === 'users' ? 'active' : '' %>"><i
+                    class="fa fa-users me-2"></i>Users</a>
+        </div>
+    </nav>
+</div>
+<!-- Sidebar End -->
