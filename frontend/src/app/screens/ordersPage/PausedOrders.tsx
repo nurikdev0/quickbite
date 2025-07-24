@@ -13,6 +13,7 @@ import { sweetErrorHandling } from "../../../lib/sweetAlert";
 import { OrderStatus } from "../../../lib/enums/order.enum";
 import { useGlobals } from "../../hooks/useGlobals";
 import OrderService from "../../services/OrderService";
+import { useHistory } from "react-router-dom";
 
 // REDUX SLICE & SELECTOR
 const pausedOrdersRetriever = createSelector(
@@ -28,6 +29,8 @@ export default function PausedOrders(props: PausedOrdersProps) {
   const { setValue } = props;
   const { authMember, setOrderBuilder } = useGlobals();
   const { pausedOrders } = useSelector(pausedOrdersRetriever);
+
+  const history = useHistory();
 
   // HANDLERS
 
@@ -52,12 +55,12 @@ export default function PausedOrders(props: PausedOrdersProps) {
     }
   };
 
-  const processOrderHandler = async (e: T) => {
+  const chooseOrderPayment = async (id: string) => {
     try {
       if (!authMember) throw new Error(Messages.error2);
       // PAYMENT PROCESS
 
-      const orderId = e.target.value;
+      const orderId = id;
       const input: OrderUpdateInput = {
         orderId: orderId,
         orderStatus: OrderStatus.PROCESS,
@@ -69,8 +72,9 @@ export default function PausedOrders(props: PausedOrdersProps) {
       if (confirmation) {
         const order = new OrderService();
         await order.updateOrder(input);
-        setValue("2");
+        // setValue("2");
         setOrderBuilder(new Date());
+        history.push(`/order-pay/${orderId}`);
       }
     } catch (err) {
       console.log(err);
@@ -135,7 +139,7 @@ export default function PausedOrders(props: PausedOrdersProps) {
                   value={order._id}
                   variant="contained"
                   className={"pay-button"}
-                  onClick={processOrderHandler}
+                  onClick={() => chooseOrderPayment(order._id)}
                 >
                   Payment
                 </Button>

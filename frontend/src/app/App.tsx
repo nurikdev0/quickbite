@@ -17,6 +17,7 @@ import MemberService from "./services/MemberService";
 import { useGlobals } from "./hooks/useGlobals";
 import "../css/app.css";
 import "../css/navbar.css";
+import PaymentOrders from "./screens/ordersPage/PaymentOrders";
 // import "../css/footer.css";
 
 function App() {
@@ -82,6 +83,9 @@ function App() {
       {/* A <Switch> looks through its children <Route>s and
             renders the first one that matches the current URL. */}
       <Switch>
+        <Route path="/order-pay/:orderId">
+          <PaymentOrders />
+        </Route>
         <Route path="/products">
           <ProductsPage onAdd={onAdd} />
         </Route>

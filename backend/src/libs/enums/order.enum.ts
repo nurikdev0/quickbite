@@ -4,3 +4,8 @@ export enum OrderStatus {
   FINISH = "FINISH",
   DELETE = "DELETE",
 }
+
+export enum OrderState {
+  PENDING = "PENDING",
+  PAID = "PAID",
+}

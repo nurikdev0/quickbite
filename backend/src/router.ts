@@ -1,9 +1,11 @@
-import express from "express";
+import express, { Request, Response } from "express";
 const router = express.Router();
 import memberController from "./controllers/member.controller";
 import productController from "./controllers/product.controller";
 import orderController from "./controllers/order.controller";
+import paymentController from "./controllers/payment.controller";
 import makeUploader from "./libs/utils/uploader";
+import bodyParser from "body-parser";
 
 // Member
 router.get("/member/restaurant", memberController.getRestaurant);
@@ -52,5 +54,24 @@ router.post(
   memberController.verifyAuth,
   orderController.updateOrder
 );
+
+// Payment
+router.get(
+  "/create-payment/:id",
+  memberController.verifyAuth,
+  orderController.createPayment
+);
+router.post(
+  "/payment",
+  bodyParser.raw({ type: "application/json" }),
+  paymentController.verifyAuthPayment,
+  paymentController.pay
+);
+router.get("/config", (_: Request, res: Response): void => {
+  // Serve checkout page.
+  res.send({
+    publishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
+  });
+});
 
 export default router;

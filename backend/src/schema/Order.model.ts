@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { OrderStatus } from "../libs/enums/order.enum";
+import { OrderState, OrderStatus } from "../libs/enums/order.enum";
 
 const orderSchema = new Schema(
   {
@@ -17,6 +17,12 @@ const orderSchema = new Schema(
       type: String,
       enum: OrderStatus,
       default: OrderStatus.PAUSE,
+    },
+
+    orderState: {
+      type: String,
+      enum: OrderState,
+      default: OrderState.PENDING,
     },
 
     memberId: {

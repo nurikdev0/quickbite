@@ -11,13 +11,14 @@ import { useDispatch } from "react-redux";
 import { Dispatch } from "@reduxjs/toolkit";
 import { setPausedOrders, setProcessOrders, setFinishedOrders } from "./slice";
 import { Order, OrderInquiry } from "../../../lib/types/order";
-import { OrderStatus } from "../../../lib/enums/order.enum";
+import { OrderState, OrderStatus } from "../../../lib/enums/order.enum";
 import OrderService from "../../services/OrderService";
 import { useGlobals } from "../../hooks/useGlobals";
-import { NavLink, useHistory } from "react-router-dom";
-import "../../../css/order.css";
+import { NavLink, useHistory, useLocation } from "react-router-dom";
 import { serverApi } from "../../../lib/config";
 import { MemberType } from "../../../lib/enums/member.enum";
+import "../../../css/payment.css";
+import "../../../css/order.css";
 
 // REDUX SLICE & SELECTOR
 const actionDispatch = (dispatch: Dispatch) => ({
@@ -36,7 +37,25 @@ export default function OrdersPage() {
     page: 1,
     limit: 5,
     orderStatus: OrderStatus.PAUSE,
+    orderState: OrderState.PENDING,
   });
+
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+
+    if (
+      params.has("payment_intent") ||
+      params.has("payment_intent_client_secret") ||
+      params.has("redirect_status")
+    ) {
+      history.replace({
+        pathname: location.pathname,
+        search: "",
+      });
+    }
+  }, [location, history]);
 
   useEffect(() => {
     const order = new OrderService();
@@ -52,7 +71,11 @@ export default function OrdersPage() {
       .catch((err) => console.log(err));
 
     order
-      .getMyOrders({ ...orderInquiry, orderStatus: OrderStatus.FINISH })
+      .getMyOrders({
+        ...orderInquiry,
+        orderStatus: OrderStatus.FINISH,
+        orderState: OrderState.PAID,
+      })
       .then((data) => setFinishedOrders(data))
       .catch((err) => console.log(err));
   }, [orderInquiry, orderBuilder]);
@@ -70,7 +93,7 @@ export default function OrdersPage() {
         <div className="dashboard_area">
           <div className="row">
             <div
-              className="col-xl-3 col-lg-4 wow fadeInUp"
+              className="col-xl-3 col-lg-3 wow fadeInUp"
               data-wow-duration="1s"
             >
               <div className="dashboard_menu">
@@ -137,7 +160,7 @@ export default function OrdersPage() {
               </div>
             </div>
             <div
-              className="col-xl-9 col-lg-8 wow fadeInUp"
+              className="col-xl-9 col-lg-9 wow fadeInUp"
               data-wow-duration="1s"
             >
               <div className={"order-page"}>
@@ -154,7 +177,7 @@ export default function OrdersPage() {
                           >
                             <Tab label="PAUSED ORDERS" value={"1"} />
                             <Tab label="PROCESS ORDERS" value={"2"} />
-                            <Tab label="FINISHED ORDERS" value={"3"} />
+                            <Tab label="PAID ORDERS" value={"3"} />
                           </Tabs>
                         </Box>
                       </Box>

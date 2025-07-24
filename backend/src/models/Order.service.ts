@@ -1,26 +1,31 @@
 import OrderItemModel from "../schema/OrderItem.model";
 import OrderModel from "../schema/Order.model";
+import TransactionModel from "../schema/Transaction.model";
 import { Member } from "../libs/types/member";
+
 import {
   Order,
   OrderInquiry,
   OrderItemInput,
   OrderUpdateInput,
 } from "../libs/types/order";
-import { shapeIntoMongooseObjectId } from "../libs/config";
+import { shapeIntoMongooseObjectId, stripe } from "../libs/config";
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import { ObjectId } from "mongoose";
 import MemberService from "./Member.service";
-import { OrderStatus } from "../libs/enums/order.enum";
+import { OrderState, OrderStatus } from "../libs/enums/order.enum";
+import Stripe from "stripe";
 
 class OrderService {
   private readonly orderModel;
   private readonly orderItemModel;
+  private readonly transactionModel;
   private readonly memberService;
 
   constructor() {
     this.orderModel = OrderModel;
     this.orderItemModel = OrderItemModel;
+    this.transactionModel = TransactionModel;
     this.memberService = new MemberService();
   }
 
@@ -128,5 +133,66 @@ class OrderService {
     }
     return result;
   }
+
+  public async createPayment(
+    memberId: ObjectId | null,
+    orderId: string
+  ): Promise<Stripe.PaymentIntent> {
+    const orderIdObject = shapeIntoMongooseObjectId(orderId);
+    let paymentIntent: Stripe.PaymentIntent;
+
+    let orderResult = await this.orderModel
+      .findOne({
+        _id: orderIdObject,
+        orderStatus: OrderStatus.PROCESS,
+      })
+      .exec();
+    if (!orderResult)
+      throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
+
+    const orderTotal = Math.round(Number(orderResult.orderTotal) * 100);
+
+    try {
+      paymentIntent = await stripe.paymentIntents.create({
+        currency: "usd",
+        amount: orderTotal,
+        automatic_payment_methods: { enabled: true },
+        metadata: { orderId: orderId },
+      });
+    } catch (err) {
+      console.log("Error, model:createPayment:", err);
+      throw new Errors(HttpCode.BAD_REQUEST, Message.CREATE_FAILED);
+    }
+
+    return paymentIntent;
+  }
+
+  public async createTransaction(id: string): Promise<void> {
+    console.log("createTransaction");
+
+    try {
+      await this.transactionModel.create({
+        orderId: id,
+      });
+    } catch (err) {
+      console.log("Error, model:createTransaction:", err);
+    }
+  }
+
+  public async updateOrderState(orderId: string): Promise<void> {
+    const result = await this.orderModel
+      .findOneAndUpdate(
+        {
+          _id: orderId,
+        },
+        { orderState: OrderState.PAID, orderStatus: OrderStatus.FINISH }
+      )
+      .exec();
+    if (!result) {
+      console.log("Error, updateOrderState");
+      throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
+    }
+  }
 }
+
 export default OrderService;

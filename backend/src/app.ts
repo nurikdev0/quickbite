@@ -1,5 +1,6 @@
 import cors from "cors";
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
+import bodyParser from "body-parser";
 import path from "path";
 import router from "./router";
 import routerAdmin from "./router-Admin";
@@ -22,7 +23,14 @@ const app = express();
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static("./uploads"));
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use("/payment", bodyParser.raw({ type: "application/json" }));
+app.use((req: Request, res: Response, next: NextFunction): void => {
+  if (req.originalUrl === "/payment") {
+    next();
+  } else {
+    express.json()(req, res, next);
+  }
+});
 app.use(cors({ credentials: true, origin: true }));
 app.use(cookieParser());
 app.use(morgan(MORGAN_FORMAT));

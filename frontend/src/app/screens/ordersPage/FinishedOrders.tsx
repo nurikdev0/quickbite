@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Stack } from "@mui/material";
+import { Box, Button, Stack } from "@mui/material";
 import TabPanel from "@mui/lab/TabPanel";
 import { useSelector } from "react-redux";
 import { createSelector } from "reselect";
@@ -61,6 +61,17 @@ export default function FinishedOrders() {
                   <p>Total</p>
                   <p>${order.orderTotal}</p>
                 </Box>
+                {order.orderState === "PAID" ? (
+                  <Button
+                    variant="contained"
+                    className={"pay-button"}
+                    style={{ background: "red" }}
+                  >
+                    PAID
+                  </Button>
+                ) : (
+                  ""
+                )}
               </Box>
             </Box>
           );

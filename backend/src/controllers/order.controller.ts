@@ -56,4 +56,22 @@ orderController.updateOrder = async (req: ExtendedRequest, res: Response) => {
   }
 };
 
+orderController.createPayment = async (req: ExtendedRequest, res: Response) => {
+  try {
+    console.log("createPayment");
+    const orderId = req.params.id;
+    const memberId = req.member?._id ?? null;
+
+    const result = await orderService.createPayment(memberId, orderId);
+
+    res.status(HttpCode.OK).json({
+      clientSecret: result.client_secret,
+    });
+  } catch (err) {
+    console.log("Error, createPayment:", err);
+    if (err instanceof Errors) res.status(err.code).json(err);
+    else res.status(Errors.standard.code).json(Errors.standard);
+  }
+};
+
 export default orderController;
