@@ -1,7 +1,7 @@
 {
   "name": "backend-quickbite",
   "version": "1.0.0",
-  "description": "Burak backend",
+  "description": "backend",
   "main": "src/server.ts",
   "scripts": {
     "start": "ts-node src/server.ts",

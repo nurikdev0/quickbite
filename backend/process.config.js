@@ -1,6 +1,6 @@
 module.exports = {
     apps: [{
-        name: "BURAK",
+        name: "BACKEND-QUICKBITE",
         cwd: "./",
         script: "./dist/server.js",
         watch: false,
