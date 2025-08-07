@@ -1,5 +1,5 @@
 {
-  "name": "burak-react",
+  "name": "frontend-quickbite",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -45,6 +45,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "start:prod": "serve -s build -l 3011",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
