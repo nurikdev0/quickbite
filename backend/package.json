@@ -1,5 +1,5 @@
 {
-  "name": "burak",
+  "name": "backend-quickbite",
   "version": "1.0.0",
   "description": "Burak backend",
   "main": "src/server.ts",
