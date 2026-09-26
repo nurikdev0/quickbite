@@ -1,9 +1,13 @@
-$(function () {
+// Home page jQuery plugins. These mutate DOM that React renders, so they must
+// only run AFTER React has rendered the data (see HomePage useEffect), and be
+// torn down on unmount. Never auto-run this file on load.
+window.initHomePage = function () {
     "use strict";
 
     //======menu fix js======
-    var navoff = $('.main_menu').offset().top;
-    $(window).scroll(function () {
+    var $menu = $('.main_menu');
+    var navoff = $menu.length ? $menu.offset().top : 0;
+    $(window).off('scroll.homeMenu').on('scroll.homeMenu', function () {
         var scrolling = $(this).scrollTop();
 
         if (scrolling > navoff) {
@@ -269,13 +273,13 @@ $(function () {
 
 
     //*=======SCROLL BUTTON=======
-    $('.scroll_btn').on('click', function () {
+    $('.scroll_btn').off('click.home').on('click.home', function () {
         $('html, body').animate({
             scrollTop: 0,
         }, 300);
     });
 
-    $(window).on('scroll', function () {
+    $(window).off('scroll.homeBtn').on('scroll.homeBtn', function () {
         var scrolling = $(this).scrollTop();
 
         if (scrolling > 500) {
@@ -344,7 +348,10 @@ $(function () {
 
 
     //======wow js=======
-    new WOW().init();
+    if (!window.__wowStarted) {
+        new WOW().init();
+        window.__wowStarted = true;
+    }
 
 
     //=======PRODUCT DETAILS SLIDER======
@@ -355,9 +362,26 @@ $(function () {
     }
 
     //=======SMALL DEVICE MENU ICON======
-    $(".navbar-toggler").on("click", function () {
+    $(".navbar-toggler").off("click.home").on("click.home", function () {
         $(".navbar-toggler").toggleClass("show");
     });
 
 
-});
+};
+
+window.destroyHomePage = function () {
+    "use strict";
+
+    $(window).off('scroll.homeMenu scroll.homeBtn');
+    $('.scroll_btn').off('click.home');
+    $('.navbar-toggler').off('click.home');
+
+    $('.slick-initialized').slick('unslick');
+
+    var $grid = $('.grid');
+    if ($grid.data('isotope')) $grid.isotope('destroy');
+
+    $('.select_js').each(function () {
+        if ($(this).next('.nice-select').length) $(this).niceSelect('destroy');
+    });
+};
