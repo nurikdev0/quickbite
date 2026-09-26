@@ -63,9 +63,8 @@
   <script src="%PUBLIC_URL%/js/sticky_sidebar.js" defer></script>
   <script src="%PUBLIC_URL%/js/wow.min.js" defer></script>
   <script src="%PUBLIC_URL%/js/jquery.exzoom.js" defer></script>
-  <!-- Custom JS -->
-  <!-- Only defines window.initHomePage / destroyHomePage; HomePage calls them -->
-  <script src="%PUBLIC_URL%/js/main.js" defer></script>
+  <!-- Custom JS: home page plugin init lives in src/app/screens/homePage/homePlugins.ts.
+       Do NOT load /js/main.js here: browsers cache it and an old copy crashes React. -->
 
 
 </body>

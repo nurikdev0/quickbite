@@ -16,14 +16,7 @@ import MemberService from "../../services/MemberService";
 import { Member } from "../../../lib/types/member";
 import "../../../css/home.css";
 import Reservation from "./Reservation";
-
-// Defined in public/js/main.js (loaded from index.html)
-declare global {
-  interface Window {
-    initHomePage?: () => void;
-    destroyHomePage?: () => void;
-  }
-}
+import { destroyHomePlugins, initHomePlugins } from "./homePlugins";
 
 // REDUX SLICE & SELECTOR
 const actionDispatch = (dispatch: Dispatch) => ({
@@ -73,13 +66,14 @@ export default function HomePage() {
   useEffect(() => {
     if (!dataLoaded) return;
 
-    const init = () => window.initHomePage?.();
-    if (window.initHomePage) init();
-    else document.addEventListener("DOMContentLoaded", init, { once: true });
+    // jQuery + plugins come from deferred scripts in index.html; if they are
+    // not loaded yet, retry once the page has fully loaded.
+    const init = () => initHomePlugins();
+    if (!init()) window.addEventListener("load", init, { once: true });
 
     return () => {
-      document.removeEventListener("DOMContentLoaded", init);
-      window.destroyHomePage?.();
+      window.removeEventListener("load", init);
+      destroyHomePlugins();
     };
   }, [dataLoaded]);
 
